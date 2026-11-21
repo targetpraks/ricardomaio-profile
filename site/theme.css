@@ -1,28 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ricardo Maio — entrepreneur, Cape Town</title>
-<meta name="description" content="Ricardo Maio builds systems that let a business grow past one location. Infinity Brands, ACDC Express, The Local Farmer and INFX Solutions.">
-<meta name="robots" content="noindex, nofollow">
-<meta name="author" content="Ricardo Maio">
-<meta name="theme-color" content="#FBF8F3">
-<meta name="color-scheme" content="light">
-<link rel="canonical" href="https://targetpraks.github.io/ricardomaio-profile">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://targetpraks.github.io/ricardomaio-profile">
-<meta property="og:title" content="Ricardo Maio — entrepreneur, Cape Town">
-<meta property="og:description" content="Ricardo Maio builds systems that let a business grow past one location. Infinity Brands, ACDC Express, The Local Farmer and INFX Solutions.">
-<meta property="og:image" content="https://targetpraks.github.io/ricardomaio-profile/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Ricardo Maio. I build systems that let a business grow past one location.">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ricardo Maio — entrepreneur, Cape Town">
-<meta name="twitter:description" content="Ricardo Maio builds systems that let a business grow past one location. Infinity Brands, ACDC Express, The Local Farmer and INFX Solutions.">
-<meta name="twitter:image" content="https://targetpraks.github.io/ricardomaio-profile/og.png">
-<style>
 /* theme.css - ricardomaio.co.za. System fonts only; no imports, no webfonts, no external files.
 
    Markup expected from the build lane (no literal tags here: this file is inlined into the page,
@@ -338,36 +313,3 @@ a:focus-visible {
   .work a:hover .co-arrow,
   .work a:hover::after { transform: none; }
 }
-</style>
-</head>
-<body>
-<div class="page">
-<header class="hero">
-<div class="monogram" role="img" aria-label="Ricardo Maio"><span aria-hidden="true">RM</span></div>
-<div class="intro">
-<h1 class="name">Ricardo Maio</h1>
-<p class="positioning">I build systems that let a business grow past one location.</p>
-<p class="tagline">Entrepreneur! Proud Dad. Getting Shit Done the right way vs the quick way.</p>
-<p class="city">Cape Town, South Africa</p>
-</div>
-</header>
-<main>
-<hr class="rule">
-<div class="work">
-<ul class="companies">
-<li><a href="https://infinitybrands.co.za"><span class="co-name">Infinity Brands</span><span class="co-line">Franchise systems that let a business grow past one location.</span></a></li>
-<li><a href="https://acdcexpress.com"><span class="co-name">ACDC Express</span><span class="co-line">Electrical wholesale and lighting, with branches nationwide.</span></a></li>
-<li><a href="https://thelocalfarmer.co.za"><span class="co-name">The Local Farmer</span><span class="co-line">Sustainable urban farming for restaurants and retailers.</span></a></li>
-<li><a href="https://infxsolutions.co.za"><span class="co-name">INFX Solutions</span><span class="co-line">Business digitisation — the group&#x27;s Zoho partner.</span></a></li>
-</ul>
-</div>
-<div class="contact-slot">
-
-</div>
-</main>
-<footer class="colophon">
-<p>&copy; 2026 Ricardo Maio</p>
-</footer>
-</div>
-</body>
-</html>
