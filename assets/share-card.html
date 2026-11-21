@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ricardo Maio — share card</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: #FBF8F3;
+  }
+  body {
+    color: #12202E;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 1200px;
+    height: 630px;
+    padding: 92px 104px 76px;
+  }
+  .rule {
+    width: 64px;
+    height: 3px;
+    margin: 0 0 44px;
+    background: #B4451F;
+  }
+  .name {
+    margin: 0;
+    color: #0B2239;
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 108px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .positioning {
+    max-width: 730px;
+    margin: 30px 0 0;
+    color: #12202E;
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: 44px;
+    line-height: 1.22;
+  }
+  .companies {
+    display: flex;
+    margin: auto 0 0;
+    padding: 26px 0 0;
+    border-top: 1px solid #D9D2C6;
+    list-style: none;
+    color: #5C6773;
+    font-size: 23px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .companies li + li::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin: 0 22px;
+    border-radius: 50%;
+    background: #D9D2C6;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="rule"></div>
+  <h1 class="name">Ricardo Maio</h1>
+  <p class="positioning">I build systems that let a business grow past one location.</p>
+  <ul class="companies">
+    <li>Infinity Brands</li>
+    <li>ACDC Express</li>
+    <li>The Local Farmer</li>
+    <li>INFX Solutions</li>
+  </ul>
+</div>
+</body>
+</html>

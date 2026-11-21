@@ -1,0 +1,4 @@
+/* Plain renderer fixture; not the site design. */
+body { font-family: system-ui, sans-serif; }
+.company-row { display: block; }
+.portrait { width: 4rem; height: 4rem; }

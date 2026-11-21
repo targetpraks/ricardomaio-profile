@@ -1,0 +1,66 @@
+{
+  "person": {
+    "name": "Ricardo Maio",
+    "positioning": "I build systems that let a business grow past one location.",
+    "tagline": "Entrepreneur! Proud Dad. Getting Shit Done the right way vs the quick way.",
+    "city": "Cape Town, South Africa",
+    "portrait_src": "",
+    "portrait_alt": "Ricardo Maio"
+  },
+  "companies": [
+    {
+      "name": "Infinity Brands",
+      "line": "Franchise development, and the systems that scale it.",
+      "url": "https://infinitybrands.co.za"
+    },
+    {
+      "name": "ACDC Express",
+      "line": "Electrical wholesale and lighting, with branches nationwide.",
+      "url": "https://acdcexpress.com"
+    },
+    {
+      "name": "The Local Farmer",
+      "line": "Sustainable urban farming for restaurants and retailers.",
+      "url": "https://thelocalfarmer.co.za"
+    },
+    {
+      "name": "INFX Solutions",
+      "line": "Business digitisation — the group's Zoho partner.",
+      "url": "https://infxsolutions.co.za"
+    }
+  ],
+  "contact": [
+    {
+      "kind": "email",
+      "label": "Email",
+      "href": "",
+      "enabled": false
+    },
+    {
+      "kind": "whatsapp",
+      "label": "WhatsApp",
+      "href": "",
+      "enabled": false
+    },
+    {
+      "kind": "linkedin",
+      "label": "LinkedIn",
+      "href": "",
+      "enabled": false
+    },
+    {
+      "kind": "instagram",
+      "label": "Instagram",
+      "href": "",
+      "enabled": false
+    }
+  ],
+  "meta": {
+    "title": "Ricardo Maio — entrepreneur, Cape Town",
+    "description": "Ricardo Maio builds systems that let a business grow past one location. Infinity Brands, ACDC Express, The Local Farmer and INFX Solutions.",
+    "site_url": "https://targetpraks.github.io/ricardomaio-profile",
+    "og_image": "og.png",
+    "year": 2026,
+    "draft": true
+  }
+}
