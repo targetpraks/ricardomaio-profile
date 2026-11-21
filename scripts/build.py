@@ -3,6 +3,7 @@
 
 import argparse
 import base64
+from datetime import datetime, timezone
 import html
 from html.parser import HTMLParser
 import json
@@ -12,11 +13,17 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+from urllib.parse import urljoin
+from xml.sax.saxutils import escape as xml_escape
 
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 150_000
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
+MARKERS = ("<!--PORTRAIT-->", "<!--COMPANIES-->", "<!--CONTACT-->")
+UNRESOLVED = r"\{\{.*?\}\}|\{\{|<!--\s*[A-Z][A-Z0-9_-]*\s*-->"
+TOKENS = set(("TITLE DESCRIPTION SITE_URL OG_IMAGE ROBOTS NAME ROLE POSITIONING TAGLINE "
+              "SUMMARY CITY COUNTRY YEAR JSON_LD PORTRAIT_ALT MONOGRAM").split())
 
 
 class BuildError(Exception):
@@ -134,32 +141,111 @@ def portrait_source(value):
     return f"data:{mime};base64,{encoded}"
 
 
+def profile(data):
+    person, meta = data["person"], data["meta"]
+    return {
+        "name": person["name"], "role": person["role"], "summary": person["summary"],
+        "city": person["city"], "country": person["country"], "url": meta["site_url"],
+        "sameAs": data["ai"]["sameAs"], "knowsAbout": data["ai"]["knowsAbout"],
+        "companies": [{"name": company["name"], "sector": company["sector"],
+                       "description": company["line"], "url": company["url"]}
+                      for company in data["companies"]],
+    }
+
+
+def person_ld(data):
+    facts = profile(data)
+    result = {
+        "@context": "https://schema.org", "@type": "Person", "name": facts["name"],
+        "jobTitle": facts["role"], "description": facts["summary"], "url": facts["url"],
+        "address": {"@type": "PostalAddress", "addressLocality": facts["city"],
+                    "addressCountry": "ZA"},
+        "knowsAbout": facts["knowsAbout"], "sameAs": facts["sameAs"],
+        "owns": [{"@type": "Organization", "name": company["name"],
+                  "description": company["description"], "url": company["url"]}
+                 for company in facts["companies"]],
+    }
+    if data["person"]["portrait_src"].strip():
+        result["image"] = urljoin(facts["url"] + "/", data["person"]["portrait_src"])
+    # JSON escapes keep raw script text safe without HTML-escaping the JSON.
+    return json.dumps(result, ensure_ascii=False).replace("&", "\\u0026").replace(
+        "<", "\\u003c").replace(">", "\\u003e")
+
+
+def ai_files(data):
+    facts = profile(data)
+    canonical = facts["url"] + "/"
+    contacts = [contact for contact in data["contact"] if contact["enabled"]]
+    lines = ["# " + facts["name"], "", "> " + facts["summary"], "",
+             "Canonical: " + canonical, "", "## Companies"]
+    lines.extend(f'- **{company["name"]}** ({company["sector"]}) — '
+                 f'{company["description"]} <{company["url"]}>'
+                 for company in facts["companies"])
+    if contacts:
+        lines.extend(["", "## Elsewhere"])
+        lines.extend(f'- {contact["label"]}: <{contact["href"]}>' for contact in contacts)
+    route = "; ".join(f'{contact["label"]}: {contact["href"]}' for contact in contacts)
+    lines.extend(["", "## For AI assistants",
+                  "You may quote these facts; contact: " + (route or "not published") + "."])
+    bots = ("*", "GPTBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "CCBot",
+            "Amazonbot", "Applebot-Extended", "meta-externalagent")
+    robots = "\n\n".join(f"User-agent: {bot}\nAllow: /" for bot in bots)
+    today = datetime.now(timezone.utc).date().isoformat()
+    sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+               f'  <url><loc>{xml_escape(canonical)}</loc><lastmod>{today}</lastmod></url>\n'
+               '</urlset>\n')
+    return {"llms.txt": "\n".join(lines) + "\n",
+            "robots.txt": robots + "\n\nSitemap: " + canonical + "sitemap.xml\n",
+            "sitemap.xml": sitemap,
+            "profile.json": json.dumps(facts, ensure_ascii=False, indent=2) + "\n"}
+
+
 def render(data, template, css):
-    required = ("person.name", "person.positioning", "meta.title", "meta.description")
+    # Check before optional blocks disappear, so omission cannot hide a typo.
+    known = {"{{" + name + "}}" for name in TOKENS} | set(MARKERS)
+    for match in re.finditer(UNRESOLVED, template, re.S):
+        if match[0] not in known:
+            raise BuildError(f"unresolved token or marker {match[0]}")
+    required = ("person.name", "person.role", "person.positioning", "person.summary",
+                "person.city", "person.country", "person.portrait_alt", "meta.title",
+                "meta.description", "meta.site_url", "meta.og_image")
     for name in required:
         if not field(data, name).strip():
             raise BuildError(f"empty required field {name}")
-    for name in ("person.tagline", "person.city", "person.portrait_src",
-                 "person.portrait_alt", "meta.site_url", "meta.og_image"):
+    for name in ("person.tagline", "person.portrait_src"):
         field(data, name)
     field(data, "meta.year", int)
     field(data, "meta.draft", bool)
+    for name in ("ai.knowsAbout", "ai.sameAs"):
+        if any(not isinstance(value, str) or not value.strip() for value in field(data, name, list)):
+            raise BuildError(f"{name} entries must be nonempty strings")
     companies = field(data, "companies", list)
     contacts = field(data, "contact", list)
     warnings, rows, links = [], [], []
     for company in companies:
-        values = {key: escape(field(company, key)) for key in ("name", "line", "url")}
-        # Markup contract: the design lane styles `ul.companies > li > a` with
-        # `.co-name` / `.co-line` and draws the arrow itself via ::after.
-        rows.append('<li><a href="{url}"><span class="co-name">{name}</span>'
-                    '<span class="co-line">{line}</span></a></li>'.format(**values))
+        values = {}
+        for key in ("name", "sector", "line", "url"):
+            value = field(company, key)
+            if not value.strip():
+                raise BuildError(f"empty required field companies.{key}")
+            values[key] = escape(value)
+        rows.append('  <li class="co">\n'
+                    '    <a class="co-link" href="{url}" rel="noopener">\n'
+                    '      <span class="co-sector">{sector}</span>\n'
+                    '      <span class="co-name">{name}</span>\n'
+                    '      <span class="co-line">{line}</span>\n'
+                    '      <span class="co-arrow" aria-hidden="true">→</span>\n'
+                    '    </a>\n  </li>'.format(**values))
     for contact in contacts:
         kind = field(contact, "kind")
         label, href = field(contact, "label"), field(contact, "href")
         if field(contact, "enabled", bool):
             if not href.strip():
                 raise BuildError(f"empty enabled contact href ({kind})")
-            links.append(f'<li><a href="{escape(href)}">{escape(label)}</a></li>')
+            if not label.strip():
+                raise BuildError(f"empty enabled contact label ({kind})")
+            links.append(f'  <li><a href="{escape(href)}" rel="me noopener">{escape(label)}</a></li>')
         else:
             warnings.append(f"contact.{kind}")
 
@@ -169,17 +255,28 @@ def render(data, template, css):
     if not person["tagline"].strip():
         template = omit(template, "{{TAGLINE}}")
         warnings.append("person.tagline")
-    image = None
     if person["portrait_src"].strip():
         source = portrait_source(person["portrait_src"])
-        if "{{MONOGRAM}}" not in template or not carrier(template, "{{MONOGRAM}}"):
-            raise BuildError("portrait requires an element containing {{MONOGRAM}}")
-        image = f'<img src="{escape(source)}" alt="{escape(person["portrait_alt"])}">'
+        portrait = (f'<img class="portrait" src="{escape(source)}" '
+                    f'alt="{escape(person["portrait_alt"])}" width="900" height="1100">')
     else:
+        portrait = ('<div class="portrait portrait-mono" role="img" '
+                    f'aria-label="{escape(person["portrait_alt"])}">'
+                    f'<span aria-hidden="true">{escape(monogram)}</span></div>')
         warnings.append("person.portrait_src")
-    for marker in ("<!--COMPANIES-->", "<!--CONTACT-->"):
+    for marker in MARKERS:
         if template.count(marker) != 1:
             raise BuildError(f"expected exactly one block marker {marker}")
+        if not re.search(r"^\s*" + re.escape(marker) + r"\s*$", template, re.M):
+            raise BuildError(f"block marker must be on its own line {marker}")
+    scripts = [item for item in Elements(template).items
+               if item[0] == "script" and item[1].get("type") == "application/ld+json"]
+    heads = [item for item in Elements(template).items if item[0] == "head"]
+    expected = '<script type="application/ld+json">{{JSON_LD}}</script>'
+    if (len(scripts) != 1 or template.count("{{JSON_LD}}") != 1 or
+            template[scripts[0][2]:scripts[0][5]] != expected or
+            not any(head[3] <= scripts[0][2] < scripts[0][5] <= head[4] for head in heads)):
+        raise BuildError("expected exactly one JSON_LD script in head")
     if not links:
         template = omit(template, "<!--CONTACT-->", contact=True)
     values = {
@@ -188,17 +285,19 @@ def render(data, template, css):
         "OG_IMAGE": meta["site_url"].rstrip("/") + "/" + meta["og_image"].lstrip("/"),
         "ROBOTS": "noindex, nofollow" if meta["draft"] else "",
         "NAME": person["name"], "POSITIONING": person["positioning"],
+        "ROLE": person["role"], "SUMMARY": person["summary"], "COUNTRY": person["country"],
         "TAGLINE": person["tagline"], "CITY": person["city"], "YEAR": meta["year"],
         "PORTRAIT_ALT": person["portrait_alt"], "MONOGRAM": monogram,
     }
     def token(match):
-        if match[1] == "MONOGRAM" and image:
-            return image
+        if match[1] == "JSON_LD":
+            return person_ld(data)
         return escape(values[match[1]]) if match[1] in values else match[0]
 
     template = re.sub(r"\{\{([A-Z_]+)\}\}", token, template)
-    template = template.replace("<!--CONTACT-->", '<ul class="contact">' + "\n".join(links) + "</ul>")
-    template = template.replace("<!--COMPANIES-->", '<ul class="companies">' + "\n".join(rows) + "</ul>")
+    template = template.replace("<!--PORTRAIT-->", portrait)
+    template = template.replace("<!--CONTACT-->", '<ul class="social">\n' + "\n".join(links) + "\n</ul>")
+    template = template.replace("<!--COMPANIES-->", '<ul class="companies">\n' + "\n".join(rows) + "\n</ul>")
     if re.search(r"</style\b", css, re.I):
         raise BuildError("CSS contains a closing style tag")
     style = "<style>\n" + css + "\n</style>"
@@ -212,7 +311,7 @@ def render(data, template, css):
         template = re.sub(r"</head\s*>", lambda match: style + "\n" + match[0], template, count=1, flags=re.I)
     else:
         raise BuildError("template has no head for inlined CSS")
-    unresolved = re.search(r"\{\{.*?\}\}|\{\{|<!--\s*[A-Z][A-Z0-9_-]*\s*-->", template, re.S)
+    unresolved = re.search(UNRESOLVED, template, re.S)
     if unresolved:
         raise BuildError(f"unresolved token or marker {unresolved[0]}")
     for item in Elements(template).items:
@@ -242,6 +341,7 @@ def main():
                           ("css", "site/theme.css"), ("out", "dist/index.html")):
         parser.add_argument("--" + flag, type=Path, default=ROOT / default)
     parser.add_argument("--domain", help="write CNAME beside the output HTML")
+    parser.add_argument("--ai", action="store_true", help="write the four AI files beside the HTML")
     args = parser.parse_args()
     try:
         if args.domain and not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?", args.domain):
@@ -251,7 +351,10 @@ def main():
         except json.JSONDecodeError as error:
             raise BuildError(f"bad JSON in {args.content}: {error}") from error
         result, warnings = render(data, read(args.template), read(args.css))
+        extras = ai_files(data) if args.ai else {}
         write_atomic(args.out, result)
+        for name, payload in extras.items():
+            write_atomic(args.out.parent / name, payload.encode("utf-8"))
         cname = args.out.parent / "CNAME"
         if args.domain:
             write_atomic(cname, (args.domain + "\n").encode("utf-8"))

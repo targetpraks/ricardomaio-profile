@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build
-        run: python3 scripts/build.py
+        run: python3 scripts/build.py --ai
       - name: Verify
         run: python3 scripts/check.py
       - name: Share card
