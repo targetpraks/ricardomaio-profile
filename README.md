@@ -46,6 +46,15 @@ Empty states are the live states, not edge cases: with no portrait the page show
 square, and with every contact entry disabled the whole contact block is removed (build prints
 `MISSING: contact.email` etc.).
 
+## AI layer
+
+`python3 scripts/build.py --ai` also writes, beside the HTML: `llms.txt` (a plain-text summary any AI agent can
+read — who he is, the five companies with URLs, the contact route), `robots.txt` (explicit `Allow: /` for
+GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Amazonbot, Applebot-Extended and meta-externalagent,
+plus the sitemap), `sitemap.xml`, and `profile.json` (machine-readable person + companies). The page itself
+carries one `Person` JSON-LD object with `owns` listing all five companies, and `person.summary` as real text
+so answer engines have a sentence to quote.
+
 ## Deploy
 
 `.github/workflows/pages.yml` builds on every push to `main`, runs the checker, and publishes `dist/`

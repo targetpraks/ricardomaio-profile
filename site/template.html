@@ -7,46 +7,52 @@
 <meta name="description" content="{{DESCRIPTION}}">
 <meta name="robots" content="{{ROBOTS}}">
 <meta name="author" content="{{NAME}}">
-<meta name="theme-color" content="#FBF8F3">
+<meta name="theme-color" content="#0F1113">
 <meta name="color-scheme" content="light">
-<link rel="canonical" href="{{SITE_URL}}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="{{SITE_URL}}">
+<link rel="canonical" href="{{SITE_URL}}/">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="{{NAME}}">
+<meta property="og:url" content="{{SITE_URL}}/">
 <meta property="og:title" content="{{TITLE}}">
 <meta property="og:description" content="{{DESCRIPTION}}">
-<meta property="og:image" content="{{OG_IMAGE}}">
+<meta property="og:image" content="{{SITE_URL}}/{{OG_IMAGE}}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="{{NAME}}. {{POSITIONING}}">
+<meta property="og:locale" content="en_ZA">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{TITLE}}">
 <meta name="twitter:description" content="{{DESCRIPTION}}">
-<meta name="twitter:image" content="{{OG_IMAGE}}">
+<meta name="twitter:image" content="{{SITE_URL}}/{{OG_IMAGE}}">
 <link rel="stylesheet" href="theme.css">
+<script type="application/ld+json">{{JSON_LD}}</script>
 </head>
 <body>
-<div class="page">
-<header class="hero">
-<div class="monogram" role="img" aria-label="{{PORTRAIT_ALT}}"><span aria-hidden="true">{{MONOGRAM}}</span></div>
-<div class="intro">
+<header class="cover">
+<p class="cover-meta"><span>{{ROLE}}</span><span>{{CITY}}, {{COUNTRY}}</span></p>
+<div class="cover-body">
+<div class="cover-portrait">
+<!--PORTRAIT-->
+</div>
+<div class="cover-text">
 <h1 class="name">{{NAME}}</h1>
 <p class="positioning">{{POSITIONING}}</p>
-<p class="tagline">{{TAGLINE}}</p>
-<p class="city">{{CITY}}</p>
+<p class="summary">{{SUMMARY}}</p>
+</div>
 </div>
 </header>
 <main>
-<hr class="rule">
-<div class="work">
+<section class="work" aria-labelledby="work-title">
+<h2 class="band-label" id="work-title">What I run</h2>
 <!--COMPANIES-->
-</div>
-<div class="contact-slot">
+</section>
+<div class="elsewhere">
 <!--CONTACT-->
 </div>
 </main>
 <footer class="colophon">
-<p>&copy; {{YEAR}} {{NAME}}</p>
+<p class="tagline">{{TAGLINE}}</p>
+<p class="copy">&copy; {{YEAR}} {{NAME}}</p>
 </footer>
-</div>
 </body>
 </html>

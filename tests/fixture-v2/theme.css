@@ -1,0 +1,6 @@
+/* Test fixture only: no production design. */
+body { margin: 2rem; font: 16px sans-serif; }
+.portrait { width: 90px; height: 110px; }
+.portrait-mono { display: grid; place-items: center; border: 1px solid; }
+.co-link { display: block; padding: 1rem 0; }
+.co-link span { margin-right: 1em; }

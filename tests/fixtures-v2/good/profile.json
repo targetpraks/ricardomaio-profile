@@ -1,0 +1,49 @@
+{
+  "name": "Ricardo Maio",
+  "role": "Entrepreneur and operator",
+  "summary": "Ricardo Maio is a Cape Town entrepreneur who builds the systems that let a business grow past one location. He runs five companies across franchising, electrical wholesale, urban farming, business digitisation and food manufacturing.",
+  "city": "Cape Town",
+  "country": "South Africa",
+  "url": "https://targetpraks.github.io/ricardomaio-profile/",
+  "sameAs": [],
+  "knowsAbout": [
+    "franchising",
+    "business systems",
+    "electrical wholesale",
+    "urban farming",
+    "business digitisation",
+    "food manufacturing"
+  ],
+  "companies": [
+    {
+      "name": "Infinity Brands",
+      "sector": "Franchising",
+      "description": "Franchise development, and the systems that scale it.",
+      "url": "https://infinitybrands.co.za"
+    },
+    {
+      "name": "ACDC Express",
+      "sector": "Wholesale",
+      "description": "Electrical wholesale and lighting, with branches nationwide.",
+      "url": "https://acdcexpress.com"
+    },
+    {
+      "name": "The Local Farmer",
+      "sector": "Agri",
+      "description": "Sustainable urban farming for restaurants and retailers.",
+      "url": "https://thelocalfarmer.co.za"
+    },
+    {
+      "name": "INFX Solutions",
+      "sector": "Technology",
+      "description": "Business digitisation — the group's Zoho partner.",
+      "url": "https://infxsolutions.co.za"
+    },
+    {
+      "name": "Papa Pasta",
+      "sector": "Food",
+      "description": "Authentic durum semolina pasta for retail shelves and industrial kitchens.",
+      "url": "https://mafgateways.com/blank-7"
+    }
+  ]
+}

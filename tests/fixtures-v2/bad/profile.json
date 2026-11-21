@@ -1,0 +1,29 @@
+{
+  "name": "Ricardo Maio",
+  "companies": [
+    {
+      "name": "Infinity Brands",
+      "sector": "Franchising",
+      "description": "Franchise development, and the systems that scale it.",
+      "url": "https://infinitybrands.co.za"
+    },
+    {
+      "name": "ACDC Express",
+      "sector": "Wholesale",
+      "description": "Electrical wholesale and lighting, with branches nationwide.",
+      "url": "https://acdcexpress.com"
+    },
+    {
+      "name": "The Local Farmer",
+      "sector": "Agri",
+      "description": "Sustainable urban farming for restaurants and retailers.",
+      "url": "https://thelocalfarmer.co.za"
+    },
+    {
+      "name": "INFX Solutions",
+      "sector": "Technology",
+      "description": "Business digitisation — the group's Zoho partner.",
+      "url": "https://infxsolutions.co.za"
+    }
+  ]
+}

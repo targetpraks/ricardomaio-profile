@@ -1,30 +1,32 @@
-/* theme.css - ricardomaio.co.za. System fonts only; no imports, no webfonts, no external files.
+/* theme.css - ricardomaio.co.za, v2 "cover" direction.
+   System fonts only. No imports, no webfonts, no external files, no example tags in comments.
 
-   Markup expected from the build lane (no literal tags here: this file is inlined into the page,
-   so example markup in a comment would be counted by the checker):
+   Styles exactly what build.py emits:
+     PORTRAIT   img.portrait, or div.portrait.portrait-mono holding one span (the initials)
+     COMPANIES  ul.companies, li.co, a.co-link, span.co-sector / .co-name / .co-line / .co-arrow
+     CONTACT    ul.social, li, a  (absent entirely when every contact is disabled)
 
-   COMPANIES marker, inside div.work in template.html:
-     ul.companies > li > a(the company url) > span.co-name + span.co-line
-     The arrow is drawn by CSS. Do not emit one; if you must, use span.co-arrow with aria-hidden="true".
-
-   CONTACT marker, inside div.contact-slot in template.html:
-     ul.contact > li > a(the contact href), text = label
-     When no entry is enabled, replace the marker with nothing; the empty slot takes no space.
-
-   Selectors are structural (.work a, .contact-slot a) so other reasonable markup still renders. */
+   Two tricks keep the page data-driven with no extra tokens:
+     - the h1 is min-content wide, so each word of the name sits on its own line; the first line
+       is cream and upright, the rest is the orange italic surname.
+     - the monogram span uses the same idea with first-letter: R cream, M orange italic. */
 
 :root {
-  --ink: #12202E;
-  --navy: #0B2239;
-  --accent: #B4451F;
+  --ink: #0F1113;
   --paper: #FBF8F3;
-  --line: #D9D2C6;
-  --muted: #5C6773;
+  --accent: #FF7A45;       /* on dark only */
+  --accent-deep: #B4451F;  /* on paper: 5.3:1 against --paper */
+  --cream: #F6F2E9;
+  --cream-mut: #C9C2B4;
+  --mut: #5E5C56;
+  --rule: #DDD6CA;
 
   --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --gutter: clamp(1.5rem, 6vw, 3rem);
+  --gutter: clamp(1.25rem, 5vw, 3.75rem);
+  --wrap: max(var(--gutter), calc((100% - 1320px) / 2));
   color-scheme: light;
 }
 
@@ -43,273 +45,317 @@ body {
   font: 400 1.0625rem/1.6 var(--sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-wrap: break-word;
+  overflow-x: clip;
 }
 
-::selection { background: #F2DED3; color: var(--ink); }
+h1, h2, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
 
-/* ---------- Column ---------- */
-
-.page {
-  box-sizing: content-box;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: clamp(3.5rem, 11vh, 7.5rem) var(--gutter) clamp(3rem, 8vh, 5rem);
+a { color: inherit; }
+a:focus-visible {
+  outline: 3px solid var(--accent-deep);
+  outline-offset: 3px;
 }
 
-/* ---------- Hero ---------- */
+/* ------------------------------------------------------------------ cover */
 
-.hero {
+.cover {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  min-height: min(86vh, 54rem);
+  min-height: min(86svh, 54rem);
+  padding: 1.5rem var(--wrap) clamp(2.75rem, 6vw, 4.5rem);
+  background: radial-gradient(120% 90% at 22% 18%, #2B2F35 0%, #14171A 45%, #08090A 100%);
+  color: var(--cream);
+  overflow: hidden;
+}
+
+.cover a:focus-visible { outline-color: var(--accent); }
+
+.cover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .25rem 1.5rem;
+  font: 500 .9375rem/1.4 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cream-mut);
+}
+.cover-meta span:first-child { color: var(--accent); }
+
+.cover-body {
+  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3rem);
+  align-content: end;
 }
 
-/* Portrait slot. With no photo it is a monogram: a square hairline frame,
-   serif initials, and an accent hairline under them. */
-.monogram {
-  display: grid;
-  place-items: center;
-  width: 4.75rem;
-  aspect-ratio: 1;
-  margin: 0 0 2.25rem;
-  border: 1px solid var(--line);
-  color: var(--navy);
-  font-family: var(--serif);
-  font-size: 1.75rem;
-  line-height: 1;
-  letter-spacing: 0.06em;
-}
+/* portrait slot: above the name on phones */
+.cover-portrait { width: min(52vw, 15rem); }
 
-.monogram > span {
-  display: block;
-  padding: 0 0 0.2em 0.06em; /* the trailing letter-spacing would skew the rule */
-  border-bottom: 1px solid var(--accent);
-}
-
-.monogram img {
+.portrait {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 9 / 11;
   object-fit: cover;
+  background: #1A1D21;
 }
 
-.intro { min-width: 0; }
+/* monogram fallback: a framed plate, not an empty box */
+.portrait-mono {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 9 / 11;
+  container-type: inline-size;
+  border: 1px solid rgba(246, 242, 233, .2);
+  background:
+    radial-gradient(70% 55% at 50% 38%, rgba(255, 122, 69, .16) 0%, transparent 70%),
+    radial-gradient(90% 80% at 50% 40%, #2C3137 0%, #121417 75%);
+}
+.portrait-mono::before {
+  content: "";
+  position: absolute;
+  inset: .75rem;
+  border: 1px solid rgba(246, 242, 233, .09);
+  pointer-events: none;
+}
+.portrait-mono span {
+  display: block;
+  font: 400 5rem/1 var(--serif);
+  font-size: 38cqi;
+  letter-spacing: -.01em;
+  color: var(--accent);
+  font-style: italic;
+  padding-right: .04em;
+  user-select: none;
+}
+.portrait-mono span::first-letter {
+  color: var(--cream);
+  font-style: normal;
+}
 
 .name {
-  margin: 0;
-  color: var(--navy);
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(2.75rem, 12vw, 4.75rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
+  width: min-content;
+  font: 400 clamp(4rem, 19vw, 11rem)/.86 var(--serif);
+  letter-spacing: -.045em;
+  color: var(--accent);
+  font-style: italic;
+}
+.name::first-line {
+  color: var(--cream);
+  font-style: normal;
 }
 
 .positioning {
-  max-width: 21em;
-  margin: 1.5rem 0 0;
-  color: var(--ink);
-  font-family: var(--serif);
-  font-size: clamp(1.5rem, 5.6vw, 2.125rem);
-  line-height: 1.25;
-  letter-spacing: -0.005em;
-  text-wrap: pretty;
+  max-width: 24ch;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  font: 400 clamp(1.375rem, 2.6vw, 2rem)/1.25 var(--serif);
+  letter-spacing: -.01em;
+  color: var(--cream);
 }
 
-.tagline {
-  max-width: 34rem;
-  margin: 1.125rem 0 0;
-  color: var(--muted);
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  text-wrap: pretty;
+.summary {
+  max-width: 54ch;
+  margin-top: 1.25rem;
+  font: 400 1rem/1.6 var(--sans);
+  color: var(--cream-mut);
 }
 
-.tagline:empty { display: none; }
+@media (min-width: 900px) {
+  .cover-body {
+    grid-template-columns: minmax(0, 1fr) clamp(18rem, 29vw, 25rem);
+    grid-template-areas: "text portrait";
+    align-items: end;
+    column-gap: clamp(3rem, 6vw, 6rem);
+  }
+  .cover-text { grid-area: text; }
+  .cover-portrait { grid-area: portrait; width: 100%; }
+  .name { font-size: clamp(6rem, 11.5vw, 11rem); }
+}
 
-.city {
-  margin: 2rem 0 0;
-  color: var(--muted);
-  font: 500 0.9375rem/1.4 var(--sans);
-  letter-spacing: 0.08em;
+/* -------------------------------------------------------------- companies */
+
+.work { padding-top: clamp(3.5rem, 8vw, 6rem); }
+
+.band-label {
+  padding: 0 var(--wrap) 1.25rem;
+  font: 500 .9375rem/1.4 var(--mono);
+  letter-spacing: .14em;
   text-transform: uppercase;
+  color: var(--mut);
 }
 
-/* ---------- Accent rule ---------- */
+.companies { border-top: 1px solid var(--rule); }
 
-.rule {
-  width: 2.5rem;
-  height: 2px;
-  margin: clamp(3.5rem, 11vw, 5rem) 0 0.75rem;
-  border: 0;
-  background: var(--accent);
-}
+.co { border-bottom: 1px solid var(--rule); }
 
-/* ---------- Companies ---------- */
-
-.work ul,
-.work ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.work li { border-bottom: 1px solid var(--line); }
-
-.work a {
+.co-link {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 1.25rem;
+  grid-template-areas:
+    "sector arrow"
+    "name   name"
+    "line   line";
   align-items: center;
+  column-gap: 1rem;
   min-height: 44px;
-  padding: 1.5rem 0;
-  color: inherit;
+  padding: 1.5rem var(--wrap) 1.625rem;
   text-decoration: none;
+  color: var(--ink);
+  transition: background-color .25s ease, color .25s ease;
 }
 
-.work a > * { grid-column: 1; }
-
-.co-name,
-.work a > :first-child {
-  display: block;
-  color: var(--navy);
-  font-family: var(--serif);
-  font-size: clamp(1.4375rem, 5vw, 1.75rem);
-  line-height: 1.2;
-  letter-spacing: -0.005em;
-  transition: color 0.2s ease;
-}
-
-.co-line,
-.work a > :nth-child(2):not(.co-arrow) {
-  display: block;
-  margin-top: 0.375rem;
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.co-arrow,
-.work a:not(:has(.co-arrow))::after {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  color: var(--muted);
-  font-family: var(--sans);
-  font-size: 1.25rem;
-  line-height: 1;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.work a:not(:has(.co-arrow))::after { content: "\2192"; }
-
-.work a:hover .co-name,
-.work a:hover > :first-child,
-.work a:hover .co-arrow,
-.work a:hover::after { color: var(--accent); }
-
-.work a:hover .co-arrow,
-.work a:hover::after { transform: translateX(0.3rem); }
-
-/* ---------- Contact ---------- */
-
-/* :first-child keeps this above the list reset below; an empty slot has no child, so no gap. */
-.contact-slot > :first-child { margin-top: 2.75rem; }
-
-.contact-slot h2,
-.contact-slot h3 {
-  margin: 0 0 0.25rem;
-  color: var(--muted);
-  font: 500 0.9375rem/1.4 var(--sans);
-  letter-spacing: 0.08em;
+.co-sector {
+  grid-area: sector;
+  font: 500 .9375rem/1.4 var(--mono);
+  letter-spacing: .14em;
   text-transform: uppercase;
+  color: var(--accent-deep);
+  transition: color .25s ease;
 }
 
-.contact-slot ul,
-.contact-slot ol {
+.co-name {
+  grid-area: name;
+  margin-top: .5rem;
+  font: 400 clamp(2.25rem, 9vw, 4.75rem)/1 var(--serif);
+  letter-spacing: -.035em;
+  transition: transform .3s ease;
+}
+
+.co-line {
+  grid-area: line;
+  max-width: 75ch;
+  margin-top: .625rem;
+  font: 400 1rem/1.5 var(--sans);
+  color: var(--mut);
+  transition: color .25s ease;
+}
+
+.co-arrow {
+  grid-area: arrow;
+  justify-self: end;
+  font: 400 1.5rem/1 var(--sans);
+  color: var(--accent-deep);
+  transition: transform .3s ease, color .25s ease;
+}
+
+@media (min-width: 760px) {
+  .co-link {
+    grid-template-columns: clamp(9rem, 16vw, 13rem) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "sector name arrow"
+      ".      line arrow";
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    padding-block: clamp(1.75rem, 2.6vw, 2.25rem);
+  }
+  .co-sector,
+  .co-name { align-self: baseline; }
+  .co-name { margin-top: 0; }
+  .co-arrow { font-size: clamp(1.75rem, 2.4vw, 2.5rem); }
+}
+
+.co-link:hover,
+.co-link:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
+.co-link:hover .co-sector,
+.co-link:focus-visible .co-sector,
+.co-link:hover .co-arrow,
+.co-link:focus-visible .co-arrow { color: var(--accent); }
+.co-link:hover .co-line,
+.co-link:focus-visible .co-line { color: var(--cream-mut); }
+.co-link:hover .co-name,
+.co-link:focus-visible .co-name { transform: translateX(.375rem); }
+.co-link:hover .co-arrow,
+.co-link:focus-visible .co-arrow { transform: translate(.375rem, -.25rem); }
+
+.co-link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+/* --------------------------------------------------------- social / contact */
+
+.social {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  align-items: baseline;
+  gap: .25rem clamp(1.5rem, 4vw, 3.5rem);
+  margin-top: clamp(3.5rem, 8vw, 6rem);
+  padding: clamp(2.5rem, 6vw, 4rem) var(--wrap);
+  background: var(--ink);
+  color: var(--cream);
 }
 
-.contact-slot a {
+.social::before {
+  content: "Elsewhere";
+  flex-basis: 100%;
+  margin-bottom: .75rem;
+  font: 500 .9375rem/1.4 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cream-mut);
+}
+
+.social a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--ink);
-  font-size: 1.0625rem;
+  padding-block: .25rem;
+  font: 400 clamp(2rem, 6vw, 3.75rem)/1.1 var(--serif);
+  letter-spacing: -.03em;
   text-decoration: underline;
-  text-decoration-color: var(--line);
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.3em;
-  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  text-underline-offset: .18em;
+  text-decoration-color: rgba(255, 122, 69, .6);
+  transition: color .2s ease, text-decoration-color .2s ease;
 }
-
-.contact-slot a:hover {
+.social a:hover {
   color: var(--accent);
   text-decoration-color: var(--accent);
 }
+.social a:focus-visible { outline-color: var(--accent); }
 
-/* ---------- Colophon ---------- */
+/* ---------------------------------------------------------------- colophon */
 
 .colophon {
-  margin-top: clamp(4.5rem, 14vw, 6.5rem);
-  color: var(--muted);
-  font-size: 0.9375rem;
-  line-height: 1.4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1.5rem;
+  padding: clamp(3rem, 7vw, 5rem) var(--wrap);
 }
 
-.colophon p { margin: 0; }
-
-/* ---------- Focus ---------- */
-
-a:focus { outline: none; }
-
-a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-  border-radius: 2px;
+.tagline {
+  max-width: 34ch;
+  font: italic 400 clamp(1.25rem, 2.2vw, 1.625rem)/1.35 var(--serif);
+  color: #3C3A35;
 }
 
-.work a:focus-visible { outline-offset: 2px; }
-
-/* ---------- Wider screens: portrait to the right ---------- */
-
-@media (min-width: 760px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 3rem;
-    align-items: start;
-  }
-
-  .intro { grid-column: 1; grid-row: 1; }
-
-  .monogram {
-    grid-column: 2;
-    grid-row: 1;
-    width: 8.5rem;
-    margin: 0.5rem 0 0;
-    font-size: 2.75rem;
-  }
-
-  .positioning { margin-top: 1.75rem; }
-
-  .work a { padding: 1.75rem 0; }
+.copy {
+  font: 500 .9375rem/1.6 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mut);
 }
 
-/* ---------- Motion ---------- */
+/* ------------------------------------------------------------------ motion */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    transition: none !important;
-    animation: none !important;
-    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
   }
-
-  .work a:hover .co-arrow,
-  .work a:hover::after { transform: none; }
+  .co-link:hover .co-name,
+  .co-link:focus-visible .co-name,
+  .co-link:hover .co-arrow,
+  .co-link:focus-visible .co-arrow { transform: none; }
 }
