@@ -154,19 +154,36 @@ def profile(data):
 
 
 def person_ld(data):
+    """A small @graph: the page, the person, the site — what answer engines stitch together."""
     facts = profile(data)
-    result = {
-        "@context": "https://schema.org", "@type": "Person", "name": facts["name"],
-        "jobTitle": facts["role"], "description": facts["summary"], "url": facts["url"],
+    person = {
+        "@type": "Person", "@id": facts["url"] + "/#person", "name": facts["name"],
+        "jobTitle": facts["role"], "description": facts["summary"], "url": facts["url"] + "/",
         "address": {"@type": "PostalAddress", "addressLocality": facts["city"],
                     "addressCountry": "ZA"},
-        "knowsAbout": facts["knowsAbout"], "sameAs": facts["sameAs"],
+        "knowsAbout": facts["knowsAbout"],
         "owns": [{"@type": "Organization", "name": company["name"],
                   "description": company["description"], "url": company["url"]}
                  for company in facts["companies"]],
     }
+    if facts["sameAs"]:
+        person["sameAs"] = facts["sameAs"]
     if data["person"]["portrait_src"].strip():
-        result["image"] = urljoin(facts["url"] + "/", data["person"]["portrait_src"])
+        person["image"] = urljoin(facts["url"] + "/", data["person"]["portrait_src"])
+    page = {
+        "@type": "ProfilePage", "@id": facts["url"] + "/#page",
+        "url": facts["url"] + "/", "name": data["meta"]["title"],
+        "description": data["meta"]["description"], "inLanguage": "en-ZA",
+        "isPartOf": {"@id": facts["url"] + "/#website"},
+        "mainEntity": {"@id": facts["url"] + "/#person"},
+        "dateModified": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+    }
+    site = {
+        "@type": "WebSite", "@id": facts["url"] + "/#website", "url": facts["url"] + "/",
+        "name": facts["name"], "inLanguage": "en-ZA",
+        "author": {"@id": facts["url"] + "/#person"},
+    }
+    result = {"@context": "https://schema.org", "@graph": [page, person, site]}
     # JSON escapes keep raw script text safe without HTML-escaping the JSON.
     return json.dumps(result, ensure_ascii=False).replace("&", "\\u0026").replace(
         "<", "\\u003c").replace(">", "\\u003e")
@@ -296,7 +313,10 @@ def render(data, template, css):
 
     template = re.sub(r"\{\{([A-Z_]+)\}\}", token, template)
     template = template.replace("<!--PORTRAIT-->", portrait)
-    template = template.replace("<!--CONTACT-->", '<ul class="social">\n' + "\n".join(links) + "\n</ul>")
+    template = template.replace(
+        "<!--CONTACT-->",
+        '<h2 class="band-label">Elsewhere</h2>\n<ul class="social">\n'
+        + "\n".join(links) + "\n</ul>")
     template = template.replace("<!--COMPANIES-->", '<ul class="companies">\n' + "\n".join(rows) + "\n</ul>")
     if re.search(r"</style\b", css, re.I):
         raise BuildError("CSS contains a closing style tag")
