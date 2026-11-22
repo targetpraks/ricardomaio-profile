@@ -8,7 +8,21 @@
     "city": "Cape Town",
     "country": "South Africa",
     "portrait_src": "",
-    "portrait_alt": "Ricardo Maio"
+    "portrait_alt": "Ricardo Maio",
+    "social": [
+      {
+        "label": "LinkedIn",
+        "href": "https://www.linkedin.com/in/ricardomaio84"
+      },
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/ricardomaio/"
+      },
+      {
+        "label": "Pinterest",
+        "href": "https://www.pinterest.com/targetpraks/"
+      }
+    ]
   },
   "companies": [
     {
@@ -18,7 +32,21 @@
       "url": "https://infinitybrands.co.za",
       "franchise_url": "",
       "video_url": "https://www.youtube.com/watch?v=0iaJiyFfCME",
-      "lead_url": "https://infinitybrands.co.za/brands"
+      "lead_url": "https://infinitybrands.co.za/brands",
+      "social": [
+        {
+          "label": "Instagram",
+          "href": "https://www.instagram.com/infinitybrands_sa"
+        },
+        {
+          "label": "Facebook",
+          "href": "https://www.facebook.com/infinitybrands.co.za"
+        },
+        {
+          "label": "YouTube",
+          "href": "https://www.youtube.com/@infinitybrands_sa"
+        }
+      ]
     },
     {
       "name": "ACDC Express",
@@ -27,7 +55,25 @@
       "url": "https://acdcexpress.com",
       "franchise_url": "https://acdcexpress.com/buy-a-franchise",
       "video_url": "https://www.youtube.com/watch?v=ymIt73_HNiA",
-      "lead_url": ""
+      "lead_url": "",
+      "social": [
+        {
+          "label": "Instagram",
+          "href": "https://www.instagram.com/acdcexpresssa"
+        },
+        {
+          "label": "Facebook",
+          "href": "https://www.facebook.com/acdcexpress"
+        },
+        {
+          "label": "TikTok",
+          "href": "https://www.tiktok.com/@acdc_express"
+        },
+        {
+          "label": "LinkedIn",
+          "href": "https://www.linkedin.com/company/acdc-express"
+        }
+      ]
     },
     {
       "name": "The Local Farmer",
@@ -36,7 +82,17 @@
       "url": "https://thelocalfarmer.co.za",
       "franchise_url": "https://thelocalfarmer.co.za/buy-a-franchise",
       "video_url": "",
-      "lead_url": ""
+      "lead_url": "",
+      "social": [
+        {
+          "label": "Instagram",
+          "href": "https://www.instagram.com/thelocalfarmer_za"
+        },
+        {
+          "label": "Facebook",
+          "href": "https://www.facebook.com/The-Local-Farmer-102059188389827"
+        }
+      ]
     },
     {
       "name": "INFX Solutions",
@@ -45,7 +101,29 @@
       "url": "https://infxsolutions.co.za",
       "franchise_url": "",
       "video_url": "",
-      "lead_url": ""
+      "lead_url": "",
+      "social": [
+        {
+          "label": "Instagram",
+          "href": "https://www.instagram.com/infxsolutions"
+        },
+        {
+          "label": "Facebook",
+          "href": "https://www.facebook.com/INFXSolutions"
+        },
+        {
+          "label": "LinkedIn",
+          "href": "https://www.linkedin.com/company/infxsolutions"
+        },
+        {
+          "label": "YouTube",
+          "href": "https://www.youtube.com/@INFX_Solutions"
+        },
+        {
+          "label": "TikTok",
+          "href": "https://www.tiktok.com/@infxsolutions"
+        }
+      ]
     },
     {
       "name": "Papa Pasta",
@@ -55,39 +133,8 @@
       "url_note": "papapasta.co.za returns 403 and papapasta.com is parked; linking the group product page until a live brand URL exists",
       "franchise_url": "",
       "video_url": "",
-      "lead_url": "https://infinitybrands.co.za/brands"
-    }
-  ],
-  "contact": [
-    {
-      "kind": "linkedin",
-      "label": "LinkedIn",
-      "href": "https://www.linkedin.com/in/ricardomaio84",
-      "enabled": true
-    },
-    {
-      "kind": "instagram",
-      "label": "Instagram",
-      "href": "",
-      "enabled": false
-    },
-    {
-      "kind": "x",
-      "label": "X",
-      "href": "",
-      "enabled": false
-    },
-    {
-      "kind": "whatsapp",
-      "label": "WhatsApp",
-      "href": "",
-      "enabled": false
-    },
-    {
-      "kind": "email",
-      "label": "Email",
-      "href": "",
-      "enabled": false
+      "lead_url": "https://infinitybrands.co.za/brands",
+      "social": []
     }
   ],
   "ai": {
@@ -99,7 +146,11 @@
       "business digitisation",
       "food manufacturing"
     ],
-    "sameAs": []
+    "sameAs": [
+      "https://www.linkedin.com/in/ricardomaio84",
+      "https://www.instagram.com/ricardomaio/",
+      "https://www.pinterest.com/targetpraks/"
+    ]
   },
   "meta": {
     "title": "Ricardo Maio — entrepreneur building systems that scale",

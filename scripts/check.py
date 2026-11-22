@@ -509,18 +509,18 @@ def main():
             re.IGNORECASE,
         )
     )
-    enabled_contacts = [entry for entry in content.get("contact", []) if entry.get("enabled")]
+    enabled_contacts = content.get("person", {}).get("social", [])
     heading_ok = True
     heading_note = "no contact links enabled; Elsewhere band absent by design"
     if enabled_contacts:
-        heading_ok = '<h2 class="band-label">Elsewhere</h2>' in html and 'class="social"' in html
+        heading_ok = '<h2 class="band-label">Follow</h2>' in html and 'class="social"' in html
         heading_note = (
-            f"{len(enabled_contacts)} contact(s) enabled; real Elsewhere heading "
+            f"{len(enabled_contacts)} personal profile(s); real Follow heading "
             f"{'present' if heading_ok else 'missing'}"
         )
     report(
         17,
-        "AI alternate link and a real Elsewhere heading",
+        "AI alternate link and a real Follow heading",
         alternate_ok and heading_ok,
         f"llms.txt alternate link {'present' if alternate_ok else 'missing'}; {heading_note}",
     )
