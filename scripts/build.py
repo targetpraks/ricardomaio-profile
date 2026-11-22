@@ -247,13 +247,28 @@ def render(data, template, css):
             if not value.strip():
                 raise BuildError(f"empty required field companies.{key}")
             values[key] = escape(value)
-        rows.append('  <li class="co">\n'
-                    '    <a class="co-link" href="{url}" rel="noopener">\n'
-                    '      <span class="co-sector">{sector}</span>\n'
-                    '      <span class="co-name">{name}</span>\n'
-                    '      <span class="co-line">{line}</span>\n'
-                    '      <span class="co-arrow" aria-hidden="true">→</span>\n'
-                    '    </a>\n  </li>'.format(**values))
+        # Fixed order and one filled primary per row: site, video, then the franchise action.
+        actions = (
+            ("chip-site", "Website", values["url"]),
+            ("chip-video", "Watch intro", escape(company.get("video_url", ""))),
+            ("chip-franchise", "Franchise", escape(company.get("franchise_url", ""))),
+            ("chip-franchise", "Franchise", escape(company.get("lead_url", ""))),
+        )
+        chips = "".join(
+            '\n        <li><a class="chip %s" href="%s" rel="noopener">%s</a></li>'
+            % (css_class, href, label)
+            for css_class, label, href in actions if href.strip()
+        )
+        rows.append(
+            '  <li class="co">\n'
+            '    <div class="co-head">\n'
+            '      <span class="co-sector">{sector}</span>\n'
+            '      <span class="co-name">{name}</span>\n'
+            '      <span class="co-line">{line}</span>\n'
+            '    </div>\n'
+            '    <ul class="co-actions">{chips}\n'
+            '    </ul>\n'
+            '  </li>'.format(chips=chips, **values))
     for contact in contacts:
         kind = field(contact, "kind")
         label, href = field(contact, "label"), field(contact, "href")

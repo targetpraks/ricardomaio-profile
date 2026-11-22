@@ -525,6 +525,33 @@ def main():
         f"llms.txt alternate link {'present' if alternate_ok else 'missing'}; {heading_note}",
     )
 
+    # v2.2: every brand carries its own action row, built from the data file — no dead buttons.
+    chip_pairs = re.findall(r'<a class="chip ([a-z-]+)" href="([^"]+)"', html)
+    chip_hrefs = {href for _, href in chip_pairs}
+    site_expected = [company.get("url", "") for company in companies]
+    franchise_expected = [c.get("franchise_url", "") for c in companies if c.get("franchise_url")]
+    video_expected = [c.get("video_url", "") for c in companies if c.get("video_url")]
+    lead_expected = [c.get("lead_url", "") for c in companies if c.get("lead_url")]
+    expected_actions = site_expected + franchise_expected + video_expected + lead_expected
+    missing_actions = [href for href in expected_actions if href not in chip_hrefs]
+    non_https_chips = [href for _, href in chip_pairs if not href.startswith("https://")]
+    site_chips = sum(1 for cls, _ in chip_pairs if cls == "chip-site")
+    actions_pass = (
+        not missing_actions
+        and not non_https_chips
+        and site_chips == len(companies)
+        and bool(chip_pairs)
+    )
+    actions_evidence = (
+        f"{len(chip_pairs)} chips = {site_chips} site + {len(franchise_expected)} franchise "
+        f"+ {len(video_expected)} video + {len(lead_expected)} enquiry, expected {len(expected_actions)}"
+    )
+    if missing_actions:
+        actions_evidence += f"; missing hrefs: {quoted(missing_actions)}"
+    if non_https_chips:
+        actions_evidence += f"; non-https chips: {quoted(non_https_chips)}"
+    report(18, "per-brand action chips match the data file", actions_pass, actions_evidence)
+
     external_anchors = sum(
         1 for tag, value in parser.hrefs if tag == "a" and value.startswith("https://")
     )

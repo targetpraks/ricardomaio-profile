@@ -11,21 +11,94 @@
     "portrait_alt": "Ricardo Maio"
   },
   "companies": [
-    { "name": "Infinity Brands", "sector": "Franchising", "line": "Franchise development, and the systems that scale it.", "url": "https://infinitybrands.co.za" },
-    { "name": "ACDC Express", "sector": "Wholesale", "line": "Electrical wholesale and lighting, with branches nationwide.", "url": "https://acdcexpress.com" },
-    { "name": "The Local Farmer", "sector": "Agri", "line": "Sustainable urban farming for restaurants and retailers.", "url": "https://thelocalfarmer.co.za" },
-    { "name": "INFX Solutions", "sector": "Technology", "line": "Business digitisation — the group's Zoho partner.", "url": "https://infxsolutions.co.za" },
-    { "name": "Papa Pasta", "sector": "Food", "line": "Authentic durum semolina pasta for retail shelves and industrial kitchens.", "url": "https://mafgateways.com/blank-7", "url_note": "papapasta.co.za returns 403 and papapasta.com is parked; linking the group product page until a live brand URL exists" }
+    {
+      "name": "Infinity Brands",
+      "sector": "Franchising",
+      "line": "Franchise development, and the systems that scale it.",
+      "url": "https://infinitybrands.co.za",
+      "franchise_url": "",
+      "video_url": "https://www.youtube.com/watch?v=0iaJiyFfCME",
+      "lead_url": "https://infinitybrands.co.za/brands"
+    },
+    {
+      "name": "ACDC Express",
+      "sector": "Wholesale",
+      "line": "Electrical wholesale and lighting, with branches nationwide.",
+      "url": "https://acdcexpress.com",
+      "franchise_url": "https://acdcexpress.com/buy-a-franchise",
+      "video_url": "https://www.youtube.com/watch?v=ymIt73_HNiA",
+      "lead_url": ""
+    },
+    {
+      "name": "The Local Farmer",
+      "sector": "Agri",
+      "line": "Sustainable urban farming for restaurants and retailers.",
+      "url": "https://thelocalfarmer.co.za",
+      "franchise_url": "https://thelocalfarmer.co.za/buy-a-franchise",
+      "video_url": "",
+      "lead_url": ""
+    },
+    {
+      "name": "INFX Solutions",
+      "sector": "Technology",
+      "line": "Business digitisation — the group's Zoho partner.",
+      "url": "https://infxsolutions.co.za",
+      "franchise_url": "",
+      "video_url": "",
+      "lead_url": ""
+    },
+    {
+      "name": "Papa Pasta",
+      "sector": "Food",
+      "line": "Authentic durum semolina pasta for retail shelves and industrial kitchens.",
+      "url": "https://mafgateways.com/blank-7",
+      "url_note": "papapasta.co.za returns 403 and papapasta.com is parked; linking the group product page until a live brand URL exists",
+      "franchise_url": "",
+      "video_url": "",
+      "lead_url": "https://infinitybrands.co.za/brands"
+    }
   ],
   "contact": [
-    { "kind": "linkedin", "label": "LinkedIn", "href": "", "enabled": false },
-    { "kind": "instagram", "label": "Instagram", "href": "", "enabled": false },
-    { "kind": "x", "label": "X", "href": "", "enabled": false },
-    { "kind": "whatsapp", "label": "WhatsApp", "href": "", "enabled": false },
-    { "kind": "email", "label": "Email", "href": "", "enabled": false }
+    {
+      "kind": "linkedin",
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/in/ricardomaio84",
+      "enabled": true
+    },
+    {
+      "kind": "instagram",
+      "label": "Instagram",
+      "href": "",
+      "enabled": false
+    },
+    {
+      "kind": "x",
+      "label": "X",
+      "href": "",
+      "enabled": false
+    },
+    {
+      "kind": "whatsapp",
+      "label": "WhatsApp",
+      "href": "",
+      "enabled": false
+    },
+    {
+      "kind": "email",
+      "label": "Email",
+      "href": "",
+      "enabled": false
+    }
   ],
   "ai": {
-    "knowsAbout": ["franchising", "business systems", "electrical wholesale", "urban farming", "business digitisation", "food manufacturing"],
+    "knowsAbout": [
+      "franchising",
+      "business systems",
+      "electrical wholesale",
+      "urban farming",
+      "business digitisation",
+      "food manufacturing"
+    ],
     "sameAs": []
   },
   "meta": {
