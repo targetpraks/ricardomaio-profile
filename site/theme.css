@@ -94,7 +94,10 @@ a:focus-visible {
   align-content: end;
 }
 
-/* portrait slot: above the name on phones */
+/* Phones: the name comes first, the monogram drops to a maker's mark underneath.
+   A 248px plate above the name pushed it to y=382 and the first company to y=904. */
+
+/* portrait slot: sized here, placed by the grid above */
 .cover-portrait { width: min(52vw, 15rem); }
 
 .portrait {
@@ -355,4 +358,26 @@ a:focus-visible {
   .co-link:focus-visible .co-name,
   .co-link:hover .co-arrow,
   .co-link:focus-visible .co-arrow { transform: none; }
+}
+
+/* ------------------------------------------------- phones: name before the mark */
+
+/* A 248px plate above the name pushed the h1 to y=382 (45% of the first screen)
+   and the first company row to y=904. Text first, monogram as a maker's mark. */
+@media (max-width: 899px) {
+  .cover-text { order: 1; }
+  .cover-portrait { order: 2; width: min(34vw, 8rem); margin-top: .25rem; }
+}
+
+/* With no photo, the plate is decoration: on phones it floats as a stray avatar after the bio,
+   so it goes. A real portrait (img.portrait, not the monogram) still shows here. */
+@media (max-width: 899px) {
+  .cover-portrait:has(.portrait-mono) { display: none; }
+}
+
+/* On a phone the hero is not a poster: no photo means no reason for 86svh of dark.
+   Content sits at the top and the companies band arrives about a screen earlier. */
+@media (max-width: 899px) {
+  .cover { min-height: 0; padding-bottom: clamp(2rem, 6vw, 3rem); }
+  .cover-body { align-content: start; flex: 0 0 auto; }
 }
