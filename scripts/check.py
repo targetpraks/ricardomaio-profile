@@ -194,11 +194,16 @@ def main():
     invalid_hrefs = [
         f"<{tag}> href={value!r}"
         for tag, value in parser.hrefs
-        if not (value.startswith("https://") or value.startswith("#"))
+        if not (
+            value.startswith("https://")
+            or value.startswith("#")
+            # an inline data-URI icon is the one permitted non-network reference
+            or (tag == "link" and value.startswith("data:image/"))
+        )
     ]
     report(
         4,
-        "every href is https:// or an in-page anchor",
+        "every href is https, an anchor, or an inline icon",
         not invalid_hrefs,
         f"all {len(parser.hrefs)} href values valid"
         if not invalid_hrefs
@@ -271,19 +276,29 @@ def main():
         json_ld_syntax_evidence,
     )
 
-    if not isinstance(json_ld_data, dict):
+    # v2 ships a @graph (ProfilePage + Person + WebSite); resolve the Person node before identifying it.
+    json_ld_person = json_ld_data
+    if isinstance(json_ld_data, dict) and isinstance(json_ld_data.get("@graph"), list):
+        candidates = [
+            node
+            for node in json_ld_data["@graph"]
+            if isinstance(node, dict) and node.get("@type") == "Person"
+        ]
+        json_ld_person = candidates[0] if candidates else {}
+
+    if not isinstance(json_ld_person, dict):
         identity_evidence = (
-            "no parsed JSON-LD object; @type, name and address.addressLocality cannot match"
+            "no parsed JSON-LD Person node; @type, name and address.addressLocality cannot match"
         )
         identity_pass = False
     else:
-        address = json_ld_data.get("address")
+        address = json_ld_person.get("address")
         if not isinstance(address, dict):
             address = {}
         identity_mismatches = []
         for label, actual, expected in (
-            ("@type", json_ld_data.get("@type"), "Person"),
-            ("name", json_ld_data.get("name"), person.get("name")),
+            ("@type", json_ld_person.get("@type"), "Person"),
+            ("name", json_ld_person.get("name"), person.get("name")),
             ("address.addressLocality", address.get("addressLocality"), person.get("city")),
         ):
             if actual != expected:
@@ -297,11 +312,11 @@ def main():
         )
     report(8, "JSON-LD Person identity and locality", identity_pass, identity_evidence)
 
-    if not isinstance(json_ld_data, dict) or not isinstance(json_ld_data.get("owns"), list):
+    if not isinstance(json_ld_person, dict) or not isinstance(json_ld_person.get("owns"), list):
         owns_pass = False
         owns_evidence = "JSON-LD owns is unavailable or is not an array"
     else:
-        owns = json_ld_data["owns"]
+        owns = json_ld_person["owns"]
         organization_count = sum(
             1
             for organization in owns
@@ -484,6 +499,30 @@ def main():
         "Papa Pasta appears as .co-name and URL href",
         papa_name_pass and papa_url_pass,
         papa_evidence,
+    )
+
+    # v2.1: the AI summary must be discoverable from the document, and the Elsewhere band must be real text.
+    alternate_ok = bool(
+        re.search(
+            r'<link[^>]+rel="alternate"[^>]+type="text/plain"[^>]+href="[^"]*llms\.txt"',
+            html,
+            re.IGNORECASE,
+        )
+    )
+    enabled_contacts = [entry for entry in content.get("contact", []) if entry.get("enabled")]
+    heading_ok = True
+    heading_note = "no contact links enabled; Elsewhere band absent by design"
+    if enabled_contacts:
+        heading_ok = '<h2 class="band-label">Elsewhere</h2>' in html and 'class="social"' in html
+        heading_note = (
+            f"{len(enabled_contacts)} contact(s) enabled; real Elsewhere heading "
+            f"{'present' if heading_ok else 'missing'}"
+        )
+    report(
+        17,
+        "AI alternate link and a real Elsewhere heading",
+        alternate_ok and heading_ok,
+        f"llms.txt alternate link {'present' if alternate_ok else 'missing'}; {heading_note}",
     )
 
     external_anchors = sum(

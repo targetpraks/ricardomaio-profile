@@ -288,19 +288,16 @@ a:focus-visible {
   flex-wrap: wrap;
   align-items: baseline;
   gap: .25rem clamp(1.5rem, 4vw, 3.5rem);
-  margin-top: clamp(3.5rem, 8vw, 6rem);
-  padding: clamp(2.5rem, 6vw, 4rem) var(--wrap);
+  padding: clamp(1.25rem, 3vw, 2rem) var(--wrap) clamp(2.5rem, 6vw, 4rem);
   background: var(--ink);
   color: var(--cream);
 }
 
-.social::before {
-  content: "Elsewhere";
-  flex-basis: 100%;
-  margin-bottom: .75rem;
-  font: 500 .9375rem/1.4 var(--mono);
-  letter-spacing: .14em;
-  text-transform: uppercase;
+/* the band's heading is real text in the document, not a CSS pseudo-element */
+.elsewhere { background: var(--ink); margin-top: clamp(3.5rem, 8vw, 6rem); }
+.elsewhere .band-label {
+  margin: 0;
+  padding: clamp(2.5rem, 6vw, 4rem) var(--wrap) 0;
   color: var(--cream-mut);
 }
 
