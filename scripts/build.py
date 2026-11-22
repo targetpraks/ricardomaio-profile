@@ -20,7 +20,7 @@ from xml.sax.saxutils import escape as xml_escape
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 150_000
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
-MARKERS = ("<!--PORTRAIT-->", "<!--COMPANIES-->", "<!--CONTACT-->")
+MARKERS = ("<!--PORTRAIT-->", "<!--COMPANIES-->", "<!--CONTACT-->", "<!--RAIL-->")
 UNRESOLVED = r"\{\{.*?\}\}|\{\{|<!--\s*[A-Z][A-Z0-9_-]*\s*-->"
 TOKENS = set(("TITLE DESCRIPTION SITE_URL OG_IMAGE ROBOTS NAME ROLE POSITIONING TAGLINE "
               "SUMMARY CITY COUNTRY YEAR JSON_LD PORTRAIT_ALT MONOGRAM").split())
@@ -192,7 +192,7 @@ def person_ld(data):
 def ai_files(data):
     facts = profile(data)
     canonical = facts["url"] + "/"
-    contacts = [contact for contact in data["contact"] if contact["enabled"]]
+    contacts = data["person"].get("social", [])
     lines = ["# " + facts["name"], "", "> " + facts["summary"], "",
              "Canonical: " + canonical, "", "## Companies"]
     lines.extend(f'- **{company["name"]}** ({company["sector"]}) — '
@@ -238,8 +238,7 @@ def render(data, template, css):
         if any(not isinstance(value, str) or not value.strip() for value in field(data, name, list)):
             raise BuildError(f"{name} entries must be nonempty strings")
     companies = field(data, "companies", list)
-    contacts = field(data, "contact", list)
-    warnings, rows, links = [], [], []
+    warnings, rows, social_blocks = [], [], []
     for company in companies:
         values = {}
         for key in ("name", "sector", "line", "url"):
@@ -269,17 +268,32 @@ def render(data, template, css):
             '    <ul class="co-actions">{chips}\n'
             '    </ul>\n'
             '  </li>'.format(chips=chips, **values))
-    for contact in contacts:
-        kind = field(contact, "kind")
-        label, href = field(contact, "label"), field(contact, "href")
-        if field(contact, "enabled", bool):
-            if not href.strip():
-                raise BuildError(f"empty enabled contact href ({kind})")
-            if not label.strip():
-                raise BuildError(f"empty enabled contact label ({kind})")
-            links.append(f'  <li><a href="{escape(href)}" rel="me noopener">{escape(label)}</a></li>')
+    # Social groups: Ricardo first, then every brand that has accounts. No dead links.
+    person_social = data["person"].get("social", [])
+    groups = []
+    if person_social:
+        groups.append((data["person"]["name"], "me", person_social))
+    for company in companies:
+        entries = company.get("social", [])
+        if entries:
+            groups.append((company["name"], "brand", entries))
         else:
-            warnings.append(f"contact.{kind}")
+            warnings.append(f"social.{company['name']}")
+    if not person_social:
+        warnings.append("person.social")
+    for group_name, kind, entries in groups:
+        rel = "me noopener" if kind == "me" else "noopener"
+        items = []
+        for entry in entries:
+            label = str(entry.get("label", "")).strip()
+            href = str(entry.get("href", "")).strip()
+            if not label or not href:
+                raise BuildError(f"social entry on {group_name} needs a label and an href")
+            items.append('\n          <li><a class="chip chip-social" href="%s" rel="%s">%s</a></li>'
+                         % (escape(href), rel, escape(label)))
+        social_blocks.append(
+            '\n    <div class="sgroup">\n      <h3>%s</h3>\n      <ul class="social">%s\n      </ul>\n    </div>'
+            % (escape(group_name), "".join(items)))
 
     person, meta = data["person"], data["meta"]
     words = person["name"].split()
@@ -309,8 +323,16 @@ def render(data, template, css):
             template[scripts[0][2]:scripts[0][5]] != expected or
             not any(head[3] <= scripts[0][2] < scripts[0][5] <= head[4] for head in heads)):
         raise BuildError("expected exactly one JSON_LD script in head")
-    if not links:
+    if not social_blocks:
         template = omit(template, "<!--CONTACT-->", contact=True)
+    if person_social:
+        rail = ('<ul class="rail">' + "".join(
+            '\n        <li><a class="chip chip-rail" href="%s" rel="me noopener">%s</a></li>'
+            % (escape(entry["href"]), escape(entry["label"])) for entry in person_social)
+            + "\n      </ul>")
+    else:
+        rail = ""
+        template = omit(template, "<!--RAIL-->")
     values = {
         "TITLE": meta["title"], "DESCRIPTION": meta["description"],
         "SITE_URL": meta["site_url"],
@@ -330,8 +352,9 @@ def render(data, template, css):
     template = template.replace("<!--PORTRAIT-->", portrait)
     template = template.replace(
         "<!--CONTACT-->",
-        '<h2 class="band-label">Elsewhere</h2>\n<ul class="social">\n'
-        + "\n".join(links) + "\n</ul>")
+        '<h2 class="band-label">Follow</h2>\n<div class="social-groups">'
+        + "".join(social_blocks) + "\n  </div>")
+    template = template.replace("<!--RAIL-->", rail)
     template = template.replace("<!--COMPANIES-->", '<ul class="companies">\n' + "\n".join(rows) + "\n</ul>")
     if re.search(r"</style\b", css, re.I):
         raise BuildError("CSS contains a closing style tag")
